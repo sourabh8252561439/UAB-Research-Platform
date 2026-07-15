@@ -1,29 +1,53 @@
-'use client'
+'use client';
 
-import * as React from 'react'
-import { motion } from 'framer-motion'
+import * as React from 'react';
+import { motion } from 'framer-motion';
 import {
-  TrendingUp, Gauge, LineChart, Activity, ScanLine, Eye,
-  Info, CheckCircle2, AlertTriangle,
-} from 'lucide-react'
-import { SectionHeading } from '@/components/section-heading'
-import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { diagnosticTests } from '@/lib/medical-data'
-import { UrodynamicDiagram } from '@/components/diagrams/urodynamic-diagram'
-import { DiagramCard } from '@/components/diagram-card'
+  TrendingUp,
+  Gauge,
+  LineChart,
+  Activity,
+  ScanLine,
+  Eye,
+  Info,
+  CheckCircle2,
+  AlertTriangle,
+} from 'lucide-react';
+import { SectionHeading } from '@/components/section-heading';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { diagnosticTests, type IconName } from '@/lib/medical-data';
+import { UrodynamicDiagram } from '@/components/diagrams/urodynamic-diagram';
+import { DiagramCard } from '@/components/diagram-card';
 
-const iconMap: Record<string, React.ElementType> = {
-  TrendingUp, Gauge, LineChart, Activity, ScanLine, Eye,
-}
+// ------------------------------------------------------------------
+//  Icon map – keyed by the same union type used in the data
+// ------------------------------------------------------------------
+const iconMap: Record<IconName, React.ElementType> = {
+  TrendingUp,
+  Gauge,
+  LineChart,
+  Activity,
+  ScanLine,
+  Eye,
+};
 
+// ------------------------------------------------------------------
+//  Colour helper for invasiveness badges
+// ------------------------------------------------------------------
 const invasivenessColors: Record<string, string> = {
-  'Non-invasive': 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300',
-  'Minimally invasive': 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300',
-  'Invasive': 'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300',
-}
+  'Non-invasive':
+    'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300',
+  'Minimally invasive':
+    'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300',
+  Invasive:
+    'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300',
+};
 
+// ------------------------------------------------------------------
+//  Static content
+// ------------------------------------------------------------------
 const diagnosticPathway = [
   {
     step: '1',
@@ -45,15 +69,18 @@ const diagnosticPathway = [
     title: 'Diagnosis & Management',
     desc: 'Diagnose UAB if BCI <100 with characteristic low-pressure/low-flow pattern. Initiate tiered treatment plan.',
   },
-]
+];
 
 const bciTable = [
   { bci: '>150', interpretation: 'Normal contractility', color: 'emerald' },
   { bci: '100–150', interpretation: 'Borderline / mild impairment', color: 'amber' },
   { bci: '<100', interpretation: 'Detrusor underactivity', color: 'rose' },
   { bci: '<50', interpretation: 'Severe underactivity', color: 'rose' },
-]
+] as const;
 
+// ------------------------------------------------------------------
+//  Component
+// ------------------------------------------------------------------
 export function Diagnosis() {
   return (
     <section
@@ -95,7 +122,10 @@ export function Diagnosis() {
                   </CardContent>
                 </Card>
                 {i < diagnosticPathway.length - 1 && (
-                  <div className="hidden lg:block absolute top-1/2 -right-3 w-6 h-px bg-gradient-to-r from-[var(--medical)] to-transparent z-10" aria-hidden="true" />
+                  <div
+                    className="hidden lg:block absolute top-1/2 -right-3 w-6 h-px bg-gradient-to-r from-[var(--medical)] to-transparent z-10"
+                    aria-hidden="true"
+                  />
                 )}
               </motion.div>
             ))}
@@ -106,7 +136,10 @@ export function Diagnosis() {
         <div className="mt-16">
           <h3 className="text-lg font-bold text-foreground mb-6">Key Diagnostic Tests</h3>
           <Tabs defaultValue={diagnosticTests[0].name} className="w-full">
-            <TabsList className="flex flex-wrap h-auto gap-1 bg-muted/60 p-1 rounded-xl mb-6" aria-label="Diagnostic tests">
+            <TabsList
+              className="flex flex-wrap h-auto gap-1 bg-muted/60 p-1 rounded-xl mb-6"
+              aria-label="Diagnostic tests"
+            >
               {diagnosticTests.map((t) => (
                 <TabsTrigger
                   key={t.name}
@@ -119,7 +152,9 @@ export function Diagnosis() {
             </TabsList>
 
             {diagnosticTests.map((test) => {
-              const Icon = iconMap[test.icon] || Activity
+              // ✅ Perfectly typed – no `as` needed, and `?? Activity` as a safe fallback
+              const Icon: React.ElementType = iconMap[test.icon] ?? Activity;
+
               return (
                 <TabsContent key={test.name} value={test.name} className="mt-0">
                   <Card className="glass shadow-soft overflow-hidden">
@@ -139,7 +174,9 @@ export function Diagnosis() {
                             </div>
                           </div>
                           <div className="mt-6">
-                            <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold rounded-full px-3 py-1 ${invasivenessColors[test.invasiveness]}`}>
+                            <span
+                              className={`inline-flex items-center gap-1.5 text-[11px] font-semibold rounded-full px-3 py-1 ${invasivenessColors[test.invasiveness]}`}
+                            >
                               {test.invasiveness}
                             </span>
                           </div>
@@ -180,7 +217,7 @@ export function Diagnosis() {
                     </CardContent>
                   </Card>
                 </TabsContent>
-              )
+              );
             })}
           </Tabs>
         </div>
@@ -201,10 +238,16 @@ export function Diagnosis() {
                     Bladder Contractility Index (BCI)
                   </h3>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Calculated as <code className="px-1.5 py-0.5 rounded bg-muted text-foreground font-mono text-xs">BCI = PdetQmax + 5 × Qmax</code>
+                    Calculated as{' '}
+                    <code className="px-1.5 py-0.5 rounded bg-muted text-foreground font-mono text-xs">
+                      BCI = PdetQmax + 5 × Qmax
+                    </code>
                   </p>
                 </div>
-                <Badge variant="secondary" className="bg-[var(--medical)]/10 text-[var(--medical)] border border-[var(--medical)]/20">
+                <Badge
+                  variant="secondary"
+                  className="bg-[var(--medical)]/10 text-[var(--medical)] border border-[var(--medical)]/20"
+                >
                   Gold standard diagnostic metric
                 </Badge>
               </div>
@@ -215,21 +258,30 @@ export function Diagnosis() {
                     <tr className="border-b border-border">
                       <th className="text-left py-3 px-4 font-semibold text-foreground">BCI Value</th>
                       <th className="text-left py-3 px-4 font-semibold text-foreground">Interpretation</th>
-                      <th className="text-left py-3 px-4 font-semibold text-foreground hidden sm:table-cell">Visual</th>
+                      <th className="text-left py-3 px-4 font-semibold text-foreground hidden sm:table-cell">
+                        Visual
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {bciTable.map((row) => (
-                      <tr key={row.bci} className="border-b border-border/60 last:border-0 hover:bg-muted/40 transition-colors">
+                      <tr
+                        key={row.bci}
+                        className="border-b border-border/60 last:border-0 hover:bg-muted/40 transition-colors"
+                      >
                         <td className="py-3 px-4 font-mono font-bold text-foreground">{row.bci}</td>
                         <td className="py-3 px-4 text-muted-foreground">{row.interpretation}</td>
                         <td className="py-3 px-4 hidden sm:table-cell">
                           <div className="w-24 h-2 rounded-full bg-muted overflow-hidden">
                             <div
                               className={`h-full rounded-full ${
-                                row.color === 'emerald' ? 'bg-emerald-500 w-full' :
-                                row.color === 'amber' ? 'bg-amber-500 w-2/3' :
-                                row.bci === '<100' ? 'bg-rose-500 w-1/3' : 'bg-rose-700 w-1/6'
+                                row.color === 'emerald'
+                                  ? 'bg-emerald-500 w-full'
+                                  : row.color === 'amber'
+                                    ? 'bg-amber-500 w-2/3'
+                                    : row.bci === '<100'
+                                      ? 'bg-rose-500 w-1/3'
+                                      : 'bg-rose-700 w-1/6'
                               }`}
                             />
                           </div>
@@ -259,5 +311,5 @@ export function Diagnosis() {
         </div>
       </div>
     </section>
-  )
+  );
 }
