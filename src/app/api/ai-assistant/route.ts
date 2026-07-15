@@ -70,13 +70,21 @@ export async function POST(req: NextRequest) {
     }
 
     // Validate messages
-    const validatedMessages = messages
-      .filter((m: ChatMessage) => m && typeof m.content === 'string' && m.content.trim())
-      .slice(-12) // keep last 12 messages for context window
-      .map((m: ChatMessage) => ({
-        role: m.role === 'assistant' ? 'assistant' : m.role === 'system' ? 'system' : 'user',
-        content: m.content.slice(0, 2000), // truncate long messages
-      }))
+    const validatedMessages: ChatMessage[] = messages
+      .filter(
+        (m): m is ChatMessage =>
+          !!m &&
+          typeof m.content === "string" &&
+          m.content.trim().length > 0 &&
+          (m.role === "user" ||
+            m.role === "assistant" ||
+            m.role === "system")
+      )
+      .slice(-12)
+      .map((m) => ({
+        role: m.role,
+        content: m.content.slice(0, 2000),
+      }));
 
     if (validatedMessages.length === 0) {
       return NextResponse.json(
@@ -91,7 +99,10 @@ export async function POST(req: NextRequest) {
     // Use the chat completions API with our medical system prompt
     const completion = await zai.chat.completions.create({
       messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
+        {
+          role: "system" as const,
+          content: SYSTEM_PROMPT,
+        },
         ...validatedMessages,
       ],
       temperature: 0.4,
