@@ -1,12 +1,32 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Standalone output (works on Vercel and self-hosting)
   output: "standalone",
-  /* config options here */
-  typescript: {
-    ignoreBuildErrors: true,
+
+  // Enable React Strict Mode
+  reactStrictMode: true,
+
+  // Enable compression
+  compress: true,
+
+  // Remove X-Powered-By header
+  poweredByHeader: false,
+
+  // Image optimization
+  images: {
+    formats: ["image/avif", "image/webp"],
   },
-  reactStrictMode: false,
+
+  // TypeScript
+  typescript: {
+    ignoreBuildErrors: false,
+  },
+
+  // ESLint
+  eslint: {
+    ignoreDuringBuilds: false,
+  },
 };
 
 export default nextConfig;
