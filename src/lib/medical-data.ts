@@ -1,6 +1,14 @@
 // Centralized medical content data for the UAB Research Platform
 // All content is evidence-based and reviewed by medical professionals.
 
+export type IconName =
+  | 'TrendingUp'
+  | 'Gauge'
+  | 'LineChart'
+  | 'Activity'
+  | 'ScanLine'
+  | 'Eye';
+
 export interface SymptomItem {
   icon: string
   title: string
@@ -117,7 +125,7 @@ export const causes: CauseItem[] = [
 export interface DiagnosticTest {
   name: string
   abbreviation: string
-  icon: string
+  icon: IconName
   purpose: string
   findings: string
   invasiveness: 'Non-invasive' | 'Minimally invasive' | 'Invasive'
